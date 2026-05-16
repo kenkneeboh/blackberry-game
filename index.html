@@ -468,7 +468,7 @@ function draw() {
   pBullets.forEach(drawBerry);
   eBullets.forEach(drawChainsawBullet);
   drawKendog(pl.x, pl.y, pl.inv > 0);
-  drawDad(boss.x, boss.y, boss.w, boss.h);
+  drawDad(boss.x, boss.y, boss.w, boss.h, boss.sawAngle, boss.flash > 0);
   drawHUD();
 
   if (state === S.WAVE_CLEAR) drawOverlay('WAVE CLEAR!', '#2ecc71', `Score: ${score}`, `Wave ${wave+1} incoming...`);
@@ -572,9 +572,11 @@ function drawKendog(x, y, flashing) {
 }
 
 // ── DAD / BOSS SPRITE ─────────────────────────────────
-function drawDad(x, y, w, h) {
+function drawDad(x, y, w, h, sawAngle, flash) {
+  if (sawAngle === undefined) sawAngle = boss ? boss.sawAngle : 0;
+  if (flash    === undefined) flash    = boss ? boss.flash > 0 : false;
   const s  = w / 92;
-  const fc = boss.flash > 0 ? '#fff' : null;
+  const fc = flash ? '#fff' : null;
   const r  = (off, col) => {
     ctx.fillStyle = fc || col;
     return ctx.fillRect.bind(ctx, x + off[0]*s, y + off[1]*s, off[2]*s, off[3]*s);
@@ -653,7 +655,7 @@ function drawDad(x, y, w, h) {
   fr(  4, 48, 22,  8, '#145e34');
 
   // ── CHAINSAW (right hand) ──
-  drawChainsaw(x + 42*s, y + 4*s, s, boss.sawAngle, fc);
+  drawChainsaw(x + 42*s, y + 4*s, s, sawAngle, fc);
 }
 
 function drawChainsaw(x, y, s, angle, flash) {
@@ -841,7 +843,7 @@ function drawTitle() {
   ctx.save();
   ctx.translate(GW/2+70, GH/2+5);
   ctx.scale(0.8,0.8);
-  drawDad(0,0,92,92);
+  drawDad(0,0,92,92, frame * 0.12, false);
   ctx.restore();
 
   ctx.fillStyle='#e8e8e8'; ctx.font='15px monospace'; ctx.textAlign='center';
